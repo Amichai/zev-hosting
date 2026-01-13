@@ -1,678 +1,809 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Dash - Death Screen Fix</title>
+    <title>yakawow</title>
     <style>
+        /* --- CSS: Main Styling --- */
         body {
-            margin: 0;
-            background-color: #050505;
-            color: white;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        h2 {
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: inline-block;
+        }
+
+        /* Top Right Login Button */
+        .top-right-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .top-right-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Tab Container */
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #333;
+            border-radius: 5px 5px 0 0;
+            margin-top: 20px;
+        }
+
+        /* Tab Buttons */
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .tab button:hover {
+            background-color: #555;
+        }
+
+        .tab button.active {
+            background-color: #d32f2f;
+        }
+
+        #adminTabBtn {
+            display: none;
+            background-color: #444;
+            color: #ff9800;
+        }
+
+        /* Tab Content */
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-top: none;
+            background-color: white;
+            min-height: 600px;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- LIBRARY GRID --- */
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .game-card {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            border-color: #d32f2f;
+        }
+
+        .game-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .game-title {
+            font-weight: bold;
+            color: #333;
+            word-break: break-word;
+        }
+
+        /* --- ANNOUNCEMENTS --- */
+        .announcement-container {
             display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 10px;
+            background-color: #fff8e1;
+            /* Light background for section */
+            border-radius: 8px;
+        }
+
+        .announcement-card {
+            background-color: #fff;
+            border: 1px solid #ffeeba;
+            border-left: 5px solid #ffc107;
+            /* Yellow stripe */
+            padding: 15px;
+            border-radius: 4px;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .announcement-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 8px;
+            display: block;
+            color: #d32f2f;
+        }
+
+        .announcement-text {
+            color: #333;
+            white-space: pre-wrap;
+            /* Keeps paragraphs/lines */
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* --- CARD BUTTONS --- */
+        .delete-card-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 2px 6px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .delete-card-btn:hover {
+            background-color: darkred;
+        }
+
+        .export-card-btn {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 2px 6px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .export-card-btn:hover {
+            background-color: #0b7dda;
+        }
+
+        /* --- PLAYER OVERLAY --- */
+        .player-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: black;
+            z-index: 1000;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            user-select: none;
-            overflow: hidden;
-        }
-
-        /* --- Main Menu & UI --- */
-        #menu-screen, #dev-level-select, #player-level-select {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #111;
-            z-index: 50;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-        }
-
-        /* Buttons */
-        .big-play-btn {
-            background: #00ff00; color: black;
-            font-size: 30px; font-weight: bold;
-            padding: 15px 50px; border: none;
-            border-radius: 10px; cursor: pointer;
-            box-shadow: 0 0 20px rgba(0,255,0,0.5);
-            transition: transform 0.2s;
-            margin-bottom: 15px; width: 300px;
-        }
-        .big-play-btn:hover { transform: scale(1.05); background: #33ff33; }
-
-        .secondary-btn {
-            background: #444; color: white;
-            font-size: 18px; font-weight: bold;
-            padding: 10px 30px; border: 2px solid #666;
-            border-radius: 8px; cursor: pointer;
-            margin-top: 10px; transition: 0.2s; width: 250px;
-        }
-        .secondary-btn:hover { background: #555; border-color: #888; }
-
-        /* --- List Styles --- */
-        .list-container {
-            width: 600px; max-height: 400px; overflow-y: auto;
-            background: #1a1a1a; border: 2px solid #333; margin: 20px 0; padding: 10px;
-        }
-        .level-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: #222; padding: 10px; margin-bottom: 5px; border: 1px solid #333;
-        }
-        .level-item-play {
-            background: #222; padding: 15px; margin-bottom: 5px;
-            border: 1px solid #333; cursor: pointer;
-            font-size: 18px; font-weight: bold; transition: 0.2s;
-        }
-        .level-item-play:hover { background: #004400; border-color: #00ff00; color: #00ff00; }
-        
-        /* --- Toolbar --- */
-        #toolbar {
-            width: 900px;
-            background: #1e1e1e; padding: 10px;
-            display: flex; justify-content: space-between;
-            border-top: 2px solid #00ff00;
-            border-left: 2px solid #333; border-right: 2px solid #333;
             box-sizing: border-box;
         }
 
-        .tool-group { display: flex; gap: 4px; margin-right: 15px; border-right: 1px solid #444; padding-right: 15px; }
-
-        button.tool-btn {
-            padding: 6px 10px; cursor: pointer;
-            background: #333; color: white;
-            border: 2px solid #555; font-weight: bold;
-            border-radius: 4px; font-size: 12px;
-            min-width: 35px;
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: rgba(211, 47, 47, 0.8);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 1001;
         }
-        button.tool-btn:hover { transform: translateY(-2px); }
-        button.tool-btn.active { border-color: white; filter: brightness(1.2); }
 
-        /* COLOR CODED BUTTONS */
-        .btn-pink { color: #ff66aa; border-color: #aa4477 !important; }
-        .btn-pink.active { background: #ff66aa; color: black; box-shadow: 0 0 10px #ff66aa; }
-        
-        .btn-yellow { color: #ffff00; border-color: #aaaa00 !important; }
-        .btn-yellow.active { background: #ffff00; color: black; box-shadow: 0 0 10px #ffff00; }
-        
-        .btn-red { color: #ff3333; border-color: #aa0000 !important; }
-        .btn-red.active { background: #ff3333; color: white; box-shadow: 0 0 10px #ff3333; }
-
-        .btn-green { color: #00ff00; border-color: #00aa00 !important; }
-        .btn-green.active { background: #00ff00; color: black; box-shadow: 0 0 10px #00ff00; }
-
-        /* --- Canvas & Game --- */
-        #game-container { position: relative; box-shadow: 0 0 50px rgba(0,255,0,0.1); }
-        canvas { display: block; background: #000; cursor: crosshair; border: 2px solid #333; }
-        
-        #scroll-container {
-            width: 900px; background: #1e1e1e; padding: 5px 10px; box-sizing: border-box;
-            border-bottom: 2px solid #333; border-left: 2px solid #333; border-right: 2px solid #333;
-            display: flex; align-items: center; gap: 10px;
+        .back-btn:hover {
+            background-color: #ff5252;
         }
-        input[type="range"] { flex-grow: 1; accent-color: #00ff00; }
 
-        /* Overlays */
-        .overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 10;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        #ActiveGameTitle,
+        #ActiveAppTitle {
+            display: none;
         }
-        .hidden { display: none !important; }
 
-        /* Modals */
-        #login-modal, #data-modal {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 100;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        .iframe-wrapper {
+            width: 95vw;
+            height: 95vh;
+            background: transparent;
+            border: none;
+            box-shadow: none;
         }
-        textarea.code-area {
-            width: 500px; height: 150px; background: #222; color: #00ff00;
-            border: 2px solid #444; padding: 10px; font-family: monospace;
-            resize: none; outline: none; margin-bottom: 15px;
+
+        .game-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
         }
-        
-        .grid-hint { width: 900px; display: flex; justify-content: space-between; color: #666; font-size: 12px; margin-top:5px;}
+
+        /* --- SHARE MODAL --- */
+        .share-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .share-textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            background-color: #eee;
+            color: #555;
+            resize: none;
+        }
+
+        .copy-btn {
+            background-color: #4CAF50;
+            /* Green */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .copy-btn:hover {
+            background-color: #3e8e41;
+        }
+
+        .close-share-btn {
+            background-color: #777;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .close-share-btn:hover {
+            background-color: #555;
+        }
+
+
+        /* --- Admin Styling --- */
+        .admin-controls {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            height: 150px;
+            font-family: monospace;
+        }
+
+        .action-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 4px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .export-btn {
+            background-color: #2196F3;
+            /* Blue */
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 4px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .danger-btn {
+            background-color: #d32f2f;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        /* Home Import Button */
+        .import-btn-large {
+            display: inline-block;
+            background-color: #673AB7;
+            /* Purple */
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .import-btn-large:hover {
+            background-color: #512da8;
+        }
     </style>
 </head>
-<body oncontextmenu="return false;"> 
 
-    <div id="menu-screen">
-        <button style="position:absolute; top:20px; right:20px; background:#333; color:#888; border:1px solid #555;" onclick="showLogin()">🔒 Dev</button>
-        <h1 style="color:#00ff00; font-size:60px; margin-bottom: 20px;">NEON DASH</h1>
-        <button class="big-play-btn" onclick="startPlaylist()">▶ PLAY ALL</button>
-        <button class="secondary-btn" style="background:#0055aa; border-color:#0088ff;" onclick="openPlayerLevelSelect()">☰ LEVEL SELECT</button>
-        <button class="secondary-btn" onclick="showImport('play')">📥 IMPORT LEVEL</button>
-        <p style="color:#666; margin-top:20px;">Levels: <span id="menu-level-count">0</span></p>
+<body>
+
+    <h2>yakawow</h2>
+
+    <button class="top-right-btn" onclick="attemptLogin()">🔒 Login</button>
+
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'Home')" id="defaultOpen">Home</button>
+        <button class="tablinks" onclick="openTab(event, 'Apps')">Apps</button>
+        <button class="tablinks" onclick="openTab(event, 'Games')">Games</button>
+        <button class="tablinks" onclick="openTab(event, 'Admin')" id="adminTabBtn">Admin</button>
     </div>
 
-    <div id="player-level-select" class="hidden">
-        <h2 style="color:#00ff00">SELECT LEVEL</h2>
-        <div id="player-list-container" class="list-container"></div>
-        <button onclick="goToMenu()" class="secondary-btn">Back</button>
+    <div id="Home" class="tabcontent">
+        <h3>Home</h3>
+        <p>Welcome to <strong>yakawow</strong>.</p>
+
+        <h4 style="border-bottom: 2px solid #ddd; padding-bottom: 10px;">📢 Announcements</h4>
+        <div id="AnnouncementsLibrary" class="announcement-container">
+            <p style="color: #666; font-style: italic;">No announcements yet.</p>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 0;">
+
+        <p>To add a new game from a friend, click the button below and paste the code.</p>
+        <button class="import-btn-large" onclick="importFromCode()">📥 Import Code</button>
     </div>
 
-    <div id="dev-level-select" class="hidden">
-        <h2 style="color:#00ccff">LEVEL MANAGER</h2>
-        <div id="level-list-container" class="list-container"></div>
-        <div style="display:flex; gap:10px; z-index:60; position:relative;">
-            <button onclick="createNewLevel()" class="secondary-btn" style="width:auto; background:#00ccff; color:black; cursor:pointer;">+ Create New</button>
-            <button onclick="goToMenu()" class="secondary-btn" style="width:auto; cursor:pointer;">Back</button>
+    <div id="Apps" class="tabcontent">
+        <h3>Apps</h3>
+        <div id="AppsLibrary" class="library-grid"></div>
+        <div id="AppsPlayer" class="player-container">
+            <button class="back-btn" onclick="closeItem('Apps')">❌ CLOSE</button>
+            <h2 id="ActiveAppTitle"></h2>
+            <div id="AppsFrameContainer" class="iframe-wrapper"></div>
         </div>
     </div>
 
-    <div id="login-modal" class="hidden">
-        <h2 style="color:#00ff00">Dev Access</h2>
-        <input type="password" id="pass-input" style="padding:10px; font-size:18px; text-align:center; background:#222; color:white; border:2px solid #333; margin-bottom:10px;" placeholder="Password">
-        <button onclick="checkPass()" class="secondary-btn" style="width:auto;">Unlock</button>
-        <button onclick="hideLogin()" style="background:none; border:none; color:#888; margin-top:10px; cursor:pointer;">Cancel</button>
-    </div>
-
-    <div id="data-modal" class="hidden">
-        <h2 id="data-title" style="color:#00ccff">CODE</h2>
-        <textarea id="data-area" class="code-area"></textarea>
-        <div style="display:flex; gap:10px;">
-            <button id="btn-data-action" class="secondary-btn" style="width:auto; background:#00ccff; color:black;" onclick="handleDataAction()">Action</button>
-            <button onclick="closeDataModal()" class="secondary-btn" style="width:auto;">Close</button>
+    <div id="Games" class="tabcontent">
+        <h3>Games</h3>
+        <div id="GamesLibrary" class="library-grid"></div>
+        <div id="GamesPlayer" class="player-container">
+            <button class="back-btn" onclick="closeItem('Games')">❌ CLOSE</button>
+            <h2 id="ActiveGameTitle"></h2>
+            <div id="GamesFrameContainer" class="iframe-wrapper"></div>
         </div>
     </div>
 
-    <div id="editor-interface" class="hidden">
-        
-        <div id="toolbar">
-            <div style="display:flex;">
-                <div class="tool-group">
-                    <button id="btn-block" class="tool-btn btn-green active" onclick="setTool('block')">■</button>
-                    <button id="btn-spike" class="tool-btn" onclick="setTool('spike')">▲</button>
-                </div>
-                <div class="tool-group">
-                    <button id="btn-pad-pink" class="tool-btn btn-pink" onclick="setTool('pad-pink')" title="Low Jump Pad">_ Lo</button>
-                    <button id="btn-pad-yellow" class="tool-btn btn-yellow" onclick="setTool('pad-yellow')" title="Medium Jump Pad">_ Mid</button>
-                    <button id="btn-pad-red" class="tool-btn btn-red" onclick="setTool('pad-red')" title="High Jump Pad">_ Hi</button>
-                </div>
-                <div class="tool-group">
-                    <button id="btn-orb-pink" class="tool-btn btn-pink" onclick="setTool('orb-pink')" title="Low Jump Orb">◎ Lo</button>
-                    <button id="btn-orb-yellow" class="tool-btn btn-yellow" onclick="setTool('orb-yellow')" title="Medium Jump Orb">◎ Mid</button>
-                    <button id="btn-orb-red" class="tool-btn btn-red" onclick="setTool('orb-red')" title="High Jump Orb">◎ Hi</button>
-                </div>
-                <div class="tool-group" style="border:none;">
-                    <button id="btn-end" class="tool-btn" style="color:#00ccff; border-color:#00ccff;" onclick="setTool('end')">⚑</button>
-                    <button id="btn-eraser" class="tool-btn" onclick="setTool('eraser')">⌫</button>
-                </div>
-            </div>
-            
-            <div style="display:flex; gap:5px; align-items:center;">
-                <button class="tool-btn" onclick="showImport('edit')">📥</button>
-                <button class="tool-btn" onclick="exportLevel()">📤</button>
-                <button id="btn-publish" class="tool-btn" style="background:#ffaa00; color:black; border-color:#ffaa00;" onclick="publishLevel()">SAVE</button>
-                <button class="tool-btn" style="background:#550000; border-color:#880000;" onclick="quitEditor()">X</button>
-            </div>
-        </div>
+    <div id="Admin" class="tabcontent">
+        <h3 style="color: red;">ADMIN CONTROL PANEL</h3>
+        <p>Create a game, app, or announcement.</p>
 
-        <div id="game-container">
-            <canvas id="canvas" width="900" height="450"></canvas>
-            
-            <div id="msg-overlay" class="overlay hidden">
-                <h1 style="color:#ff4444">CRASHED</h1>
-                <div style="display:flex; gap:20px; margin-top:20px;">
-                    <button class="secondary-btn" style="width:auto; background:#00ff00; color:black;" onclick="retryLevel()">Retry</button>
-                    
-                    <button class="secondary-btn" style="width:auto;" onclick="goToMenu()">Menu</button>
-                    
-                    <button id="btn-edit-crash" class="secondary-btn hidden" style="width:auto; border-color:#00ccff; color:#00ccff;" onclick="stopGame()">Edit</button>
-                </div>
-            </div>
+        <div class="admin-controls">
+            <label><strong>1. Name / Title:</strong></label>
+            <input type="text" id="itemTitle" placeholder="e.g. Update v1.0">
 
-            <div id="success-overlay" class="overlay hidden">
-                <h1 style="color:#00ff00">COMPLETE!</h1>
-                <button class="secondary-btn" style="background:#00ff00; color:black;" onclick="nextLevel()">Next Level</button>
-                <button class="secondary-btn" onclick="goToMenu()">Menu</button>
-            </div>
-            
-            <div id="victory-overlay" class="overlay hidden">
-                <h1 style="color:#FFD700">YOU WON!</h1>
-                <p>Playlist Completed</p>
-                <button class="secondary-btn" onclick="goToMenu()">Main Menu</button>
-            </div>
-        </div>
+            <label><strong>2. Type:</strong></label>
+            <select id="itemCategory" onchange="updatePlaceholder()">
+                <option value="Games">Game</option>
+                <option value="Apps">App</option>
+                <option value="Announcements">Announcement</option>
+            </select>
 
-        <div id="scroll-container">
-            <span style="font-size:12px; color:#888;">SCROLL:</span>
-            <input type="range" id="editor-slider" min="0" max="3000" value="0" step="40">
-        </div>
-        
-        <div class="grid-hint">
-            <span id="editor-status-text">Mode: Editor</span>
-            <span id="scroll-dist">Pos: 0</span>
+            <label><strong>3. Code / Message:</strong></label>
+            <textarea id="itemCode" placeholder="<html>... your code here ...</html>"></textarea>
+
+            <button class="action-btn" onclick="addToLibrary()">💾 Save</button>
+            <button class="export-btn" onclick="exportCurrentInput()">📤 Open Export Menu</button>
+            <br><br>
+            <button class="danger-btn" onclick="clearAllData()">⚠️ Delete ALL Data</button>
         </div>
     </div>
 
-<script>
-    // --- CONFIG & PHYSICS ---
-    const GRID = 40; 
-    const FLOOR_Y = 350; 
-    const STORAGE_KEY = 'gd_custom_levels_v7_clean';
-    const GRAVITY = 0.65;
+    <div id="ShareModal" class="share-modal">
+        <div class="share-box">
+            <h3>Share Code</h3>
+            <p>Click Copy, then send this code to a friend!</p>
+            <textarea id="shareOutput" class="share-textarea" readonly></textarea>
+            <br>
+            <button class="copy-btn" onclick="copyShareCode()">📋 COPY</button>
+            <button class="close-share-btn" onclick="closeShareModal()">Close</button>
+        </div>
+    </div>
 
-    // Jump Strengths
-    const JUMP_PAD_PINK = -10.0;   
-    const JUMP_PAD_YELLOW = -14.5; 
-    const JUMP_PAD_RED = -19.0;    
-    const JUMP_ORB_PINK = -8.0;    
-    const JUMP_ORB_YELLOW = -10.5; 
-    const JUMP_ORB_RED = -15.0;    
+    <script>
+        // --- DATA STORAGE & MIGRATION ---
 
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const slider = document.getElementById('editor-slider');
+        // 1. Check for OLD data (yakattack)
+        var oldDataString = localStorage.getItem("yakattackData");
+        var newDataString = localStorage.getItem("yakawowData");
 
-    // --- STATE ---
-    let appState = "MENU"; 
-    let tool = "block";
-    let editorScroll = 0;
-    
-    let playlist = [];      
-    let editorObjects = []; 
-    let editingIndex = null; 
-    let currentLevelIndex = 0;
-    
-    // We track who started the game to know if we should show the "Edit" button later
-    let startedFromEditor = false;
-
-    let player = { x: 150, y: 0, dy: 0, angle: 0, onGround: false, dead: false };
-    let gameSpeed = 6; 
-    let distance = 0;
-    let gameObjects = []; 
-    let gameLoopId;
-    let globalFrame = 0; 
-    let dataModalMode = "EXPORT"; 
-
-    // --- INITIALIZATION ---
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    loadSavedData();
-
-    function loadSavedData() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try { playlist = JSON.parse(saved); } catch(e) { playlist = []; }
-        }
-        document.getElementById('menu-level-count').innerText = playlist.length;
-    }
-
-    function saveGame() {
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(playlist)); } catch(e) { alert("Storage full!"); }
-        document.getElementById('menu-level-count').innerText = playlist.length;
-    }
-
-    // --- MENUS & NAVIGATION ---
-    function hideAllScreens() {
-        document.getElementById('menu-screen').classList.add('hidden');
-        document.getElementById('dev-level-select').classList.add('hidden');
-        document.getElementById('player-level-select').classList.add('hidden');
-        document.getElementById('editor-interface').classList.add('hidden');
-    }
-
-    function toggleEditorUI(show) {
-        const list = document.getElementById('toolbar').classList;
-        const scroll = document.getElementById('scroll-container').classList;
-        const hint = document.querySelector('.grid-hint').classList;
-        
-        if (show) {
-            list.remove('hidden');
-            scroll.remove('hidden');
-            hint.remove('hidden');
-        } else {
-            list.add('hidden');
-            scroll.add('hidden');
-            hint.add('hidden');
-        }
-    }
-
-    function goToMenu() {
-        if(gameLoopId) cancelAnimationFrame(gameLoopId);
-        appState = "MENU";
-        resetOverlays();
-        hideAllScreens();
-        document.getElementById('menu-screen').classList.remove('hidden');
-    }
-
-    function resetOverlays() {
-        document.getElementById('msg-overlay').classList.add('hidden');
-        document.getElementById('success-overlay').classList.add('hidden');
-        document.getElementById('victory-overlay').classList.add('hidden');
-    }
-
-    // --- EDITOR LOGIC ---
-    function setTool(t) {
-        tool = t;
-        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-        const btnId = 'btn-' + t;
-        if(document.getElementById(btnId)) document.getElementById(btnId).classList.add('active');
-    }
-
-    function handleEditorClick(e) {
-        if(appState !== "EDITOR") return;
-        const rect = canvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left + editorScroll;
-        const clickY = e.clientY - rect.top;
-        const gx = Math.floor(clickX / GRID) * GRID;
-        const gy = Math.floor(clickY / GRID) * GRID;
-        if (gy >= FLOOR_Y) return;
-
-        const existingIndex = editorObjects.findIndex(o => o.x === gx && o.y === gy);
-        if(existingIndex !== -1) editorObjects.splice(existingIndex, 1);
-
-        if (tool !== "eraser") {
-            editorObjects.push({ x: gx, y: gy, type: tool });
-        }
-        
-        if(gx > parseInt(slider.max) - 500) slider.max = parseInt(slider.max) + 2000;
-        draw();
-    }
-
-    // --- GAME LOGIC ---
-    function update() {
-        player.dy += GRAVITY; 
-        player.y += player.dy;
-        player.angle += 0.15;
-
-        if(player.y + GRID > FLOOR_Y) {
-            player.y = FLOOR_Y - GRID;
-            player.dy = 0;
-            player.onGround = true;
-            player.angle = Math.round(player.angle / (Math.PI/2)) * (Math.PI/2);
+        // 2. Auto-Migrate if old exists but new does not
+        if (oldDataString && !newDataString) {
+            console.log("Migrating data from 'yakattackData' to 'yakawowData'...");
+            localStorage.setItem("yakawowData", oldDataString);
+            newDataString = oldDataString; // Update reference for below
+            alert("Success! Your old games/apps have been moved to yakawow.");
         }
 
-        const pRect = { l: player.x + 10, r: player.x + 30, t: player.y + 10, b: player.y + 30 };
+        // 3. Load Data
+        var libraryData;
+        try {
+            libraryData = newDataString ? JSON.parse(newDataString) : { "Games": [], "Apps": [], "Announcements": [] };
+        } catch (e) {
+            libraryData = { "Games": [], "Apps": [], "Announcements": [] };
+        }
 
-        for(let obj of gameObjects) {
-            let objScreenX = obj.x - distance;
-            if(objScreenX < -100 || objScreenX > 1000) continue;
+        // AUTO-FIX: Ensure Announcements array exists if user has old data
+        if (!libraryData.Announcements) {
+            libraryData.Announcements = [];
+            localStorage.setItem("yakawowData", JSON.stringify(libraryData));
+        }
 
-            if (pRect.r > objScreenX && pRect.l < objScreenX + GRID &&
-                pRect.b > obj.y && pRect.t < obj.y + GRID) {
-                
-                if (obj.type === 'spike') { die(); return; }
-                
-                if (obj.type === 'block') {
-                    if (player.dy > 0 && player.y + 30 - player.dy <= obj.y) {
-                        player.y = obj.y - GRID;
-                        player.dy = 0;
-                        player.onGround = true;
-                        player.angle = Math.round(player.angle / (Math.PI/2)) * (Math.PI/2);
-                    } else { die(); return; }
+        var isAdmin = false;
+
+        function saveToBrowser() {
+            localStorage.setItem("yakawowData", JSON.stringify(libraryData));
+        }
+
+        // --- TAB LOGIC ---
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) { tabcontent[i].style.display = "none"; }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) { tablinks[i].className = tablinks[i].className.replace(" active", ""); }
+            document.getElementById(tabName).style.display = "block";
+            if (evt) evt.currentTarget.className += " active";
+        }
+
+        // --- LOGIN LOGIC ---
+        function attemptLogin() {
+            var password = prompt("Enter Admin Password:");
+            if (password === "deathtrap") {
+                alert("Access Granted. Edit mode enabled.");
+                isAdmin = true;
+                document.getElementById("adminTabBtn").style.display = "block";
+                document.getElementById("adminTabBtn").click();
+
+                // Refresh all
+                renderLibrary("Games");
+                renderLibrary("Apps");
+                renderLibrary("Announcements");
+            } else if (password != null) {
+                alert("Access Denied.");
+            }
+        }
+
+        // --- HELPER: Placeholder Text ---
+        function updatePlaceholder() {
+            var cat = document.getElementById("itemCategory").value;
+            var textArea = document.getElementById("itemCode");
+            if (cat === "Announcements") {
+                textArea.placeholder = "Type your news message here...";
+            } else {
+                textArea.placeholder = "<html>... your game/app code here ...</html>";
+            }
+        }
+
+        // --- LIBRARY LOGIC ---
+        function addToLibrary() {
+            var title = document.getElementById("itemTitle").value;
+            var category = document.getElementById("itemCategory").value;
+            var code = document.getElementById("itemCode").value;
+
+            if (title.trim() === "" || code.trim() === "") {
+                alert("Please fill in a Title and Code/Message.");
+                return;
+            }
+
+            var newItem = { id: Date.now(), title: title, code: code };
+
+            // Safety check
+            if (!libraryData[category]) libraryData[category] = [];
+
+            libraryData[category].push(newItem);
+            saveToBrowser();
+            renderLibrary(category);
+
+            alert(title + " Saved!");
+            document.getElementById("itemTitle").value = "";
+            document.getElementById("itemCode").value = "";
+        }
+
+        function renderLibrary(category) {
+            var container = document.getElementById(category + "Library");
+            if (!container) return; // Safety check
+
+            container.innerHTML = "";
+            var items = libraryData[category];
+
+            if (!items || items.length === 0) {
+                if (category === "Announcements") {
+                    container.innerHTML = "<p style='color:#666; font-style:italic;'>No announcements yet.</p>";
+                } else {
+                    container.innerHTML = "<p>No items found.</p>";
                 }
-                
-                if (obj.type === 'end') { winLevel(); return; }
+                return;
             }
 
-            if (obj.type.startsWith('pad')) {
-                if (pRect.r > objScreenX && pRect.l < objScreenX + GRID &&
-                    pRect.b > obj.y + 30 && pRect.t < obj.y + GRID) {
-                    
-                    player.onGround = false;
-                    player.y = obj.y + 30 - GRID; 
-                    
-                    if(obj.type === 'pad-pink') player.dy = JUMP_PAD_PINK;
-                    else if(obj.type === 'pad-red') player.dy = JUMP_PAD_RED;
-                    else player.dy = JUMP_PAD_YELLOW;
+            // Iterate backwards (Newest First)
+            for (let i = items.length - 1; i >= 0; i--) {
+                let item = items[i];
+                var card = document.createElement("div");
+
+                var deleteBtnHTML = "";
+                var exportBtnHTML = "";
+
+                if (isAdmin) {
+                    deleteBtnHTML = `<button class="delete-card-btn" onclick="deleteItem(event, '${category}', ${item.id})">Del</button>`;
+                    exportBtnHTML = `<button class="export-card-btn" onclick="exportItem(event, '${category}', ${item.id})">Share</button>`;
                 }
-            }
-        }
-        distance += gameSpeed;
-    }
 
-    function attemptJump() {
-        if(appState === "CRASHED") return;
+                if (category === "Announcements") {
+                    // --- ANNOUNCEMENT STYLE ---
+                    card.className = "announcement-card";
+                    // Using innerText for the body prevents HTML injection in news, safer for text
+                    card.innerHTML = `
+                        ${deleteBtnHTML}
+                        ${exportBtnHTML}
+                        <span class="announcement-title"></span>
+                        <div class="announcement-text"></div> 
+                    `;
+                    // Set text safely
+                    card.querySelector(".announcement-title").innerText = item.title;
+                    card.querySelector(".announcement-text").innerText = item.code;
 
-        let hitOrb = false;
-        let orbType = '';
-        
-        const pCx = player.x + 20;
-        const pCy = player.y + 20;
+                } else {
+                    // --- GAME/APP STYLE ---
+                    card.className = "game-card";
+                    var icon = category === "Games" ? "🎮" : "📱";
 
-        for(let obj of gameObjects) {
-            if(obj.type.startsWith('orb')) {
-                let objScreenX = obj.x - distance;
-                let dx = pCx - (objScreenX + 20);
-                let dy = pCy - (obj.y + 20);
-                
-                if (Math.sqrt(dx*dx + dy*dy) < 35) {
-                    hitOrb = true;
-                    orbType = obj.type;
-                    break;
+                    card.innerHTML = `
+                        ${deleteBtnHTML}
+                        ${exportBtnHTML}
+                        <span class="game-icon">${icon}</span>
+                        <span class="game-title"></span>
+                    `;
+                    card.querySelector(".game-title").innerText = item.title;
+
+                    card.onclick = function (e) {
+                        if (e.target.className !== 'delete-card-btn' && e.target.className !== 'export-card-btn') {
+                            playItem(category, item.id);
+                        }
+                    };
                 }
+                container.appendChild(card);
             }
         }
 
-        if(hitOrb) {
-            player.onGround = false;
-            if(orbType === 'orb-pink') player.dy = JUMP_ORB_PINK;
-            else if(orbType === 'orb-red') player.dy = JUMP_ORB_RED;
-            else player.dy = JUMP_ORB_YELLOW;
-        } else if(player.onGround) {
-            player.dy = -10.5; 
-            player.onGround = false;
+        function playItem(category, id) {
+            if (category === "Announcements") return;
+
+            var items = libraryData[category];
+            var selectedItem = items.find(item => item.id === id);
+            if (!selectedItem) return;
+
+            var player = document.getElementById(category + "Player");
+            player.style.display = "flex";
+
+            var titleId = category === "Games" ? "ActiveGameTitle" : "ActiveAppTitle";
+            document.getElementById(titleId).innerText = selectedItem.title;
+
+            document.body.style.overflow = "hidden";
+
+            var container = document.getElementById(category + "FrameContainer");
+            container.innerHTML = "";
+
+            var iframe = document.createElement('iframe');
+            iframe.className = "game-frame";
+            iframe.onload = function () { iframe.focus(); };
+            container.appendChild(iframe);
+
+            var doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(selectedItem.code);
+            doc.close();
         }
-    }
 
-    // --- DRAWING ---
-    function draw() {
-        ctx.fillStyle = (appState === "EDITOR") ? "#111" : "#003366";
-        ctx.fillRect(0,0,canvas.width, canvas.height);
-
-        if(appState === "EDITOR") {
-            ctx.strokeStyle = "#222"; ctx.lineWidth = 1;
-            const offset = editorScroll % GRID;
-            ctx.beginPath();
-            for(let x = -offset; x <= canvas.width; x += GRID) { ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); }
-            for(let y = 0; y < canvas.height; y += GRID) { ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); }
-            ctx.stroke();
-            ctx.strokeStyle = "yellow"; ctx.strokeRect(150 - editorScroll, 0, GRID, FLOOR_Y);
+        function closeItem(category) {
+            document.getElementById(category + "FrameContainer").innerHTML = "";
+            document.getElementById(category + "Player").style.display = "none";
+            document.body.style.overflow = "auto";
         }
 
-        ctx.fillStyle = "#001122"; ctx.fillRect(0, FLOOR_Y, canvas.width, canvas.height - FLOOR_Y);
-        ctx.strokeStyle = "white"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0,FLOOR_Y); ctx.lineTo(canvas.width, FLOOR_Y); ctx.stroke();
-
-        const objectsToDraw = (appState === "EDITOR") ? editorObjects : gameObjects;
-        const scrollX = (appState === "EDITOR") ? editorScroll : distance;
-
-        objectsToDraw.forEach(obj => {
-            let sx = obj.x - scrollX;
-            if(sx < -50 || sx > canvas.width + 50) return;
-
-            if(obj.type === 'block') {
-                ctx.fillStyle = "#00ff00"; ctx.fillRect(sx, obj.y, GRID, GRID);
-                ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.strokeRect(sx, obj.y, GRID, GRID);
-            } 
-            else if (obj.type === 'spike') {
-                ctx.fillStyle = "#000"; ctx.strokeStyle = "#fff"; ctx.lineWidth = 2;
-                ctx.beginPath(); ctx.moveTo(sx, obj.y + GRID); ctx.lineTo(sx + GRID/2, obj.y); ctx.lineTo(sx + GRID, obj.y + GRID); ctx.fill(); ctx.stroke();
+        function deleteItem(event, category, id) {
+            event.stopPropagation();
+            if (confirm("Delete this item?")) {
+                libraryData[category] = libraryData[category].filter(item => item.id !== id);
+                saveToBrowser();
+                renderLibrary(category);
             }
-            else if (obj.type.startsWith('pad')) {
-                let color = '#ffff00'; 
-                if(obj.type === 'pad-pink') color = '#ff66cc';
-                if(obj.type === 'pad-red') color = '#ff3333';
-                
-                ctx.fillStyle = color;
-                ctx.fillRect(sx + 4, obj.y + 32, 32, 8); 
-                ctx.strokeStyle = "#fff"; ctx.lineWidth = 1; 
-                ctx.strokeRect(sx + 4, obj.y + 32, 32, 8);
-                ctx.beginPath(); ctx.arc(sx + 20, obj.y + 36, 3, 0, Math.PI*2); ctx.fillStyle="white"; ctx.fill();
-                if(appState === "EDITOR") { ctx.strokeStyle = "#333"; ctx.strokeRect(sx, obj.y, GRID, GRID); }
+        }
+
+        function clearAllData() {
+            if (confirm("ARE YOU SURE? This will delete ALL games and apps forever.")) {
+                localStorage.removeItem("yakawowData");
+                // Optional: Also clear the old backup
+                // localStorage.removeItem("yakattackData"); 
+                location.reload();
             }
-            else if (obj.type.startsWith('orb')) {
-                let color = '#ffaa00'; 
-                if(obj.type === 'orb-pink') color = '#ff66cc';
-                if(obj.type === 'orb-red') color = '#ff3333';
-                let scale = 1 + Math.sin(globalFrame * 0.15) * 0.1; 
-                
-                ctx.fillStyle = "black"; ctx.beginPath(); ctx.arc(sx + 20, obj.y + 20, 14 * scale, 0, Math.PI*2); ctx.fill();
-                ctx.strokeStyle = color; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(sx + 20, obj.y + 20, 12 * scale, 0, Math.PI*2); ctx.stroke();
-                ctx.fillStyle = color; ctx.beginPath(); ctx.arc(sx + 20, obj.y + 20, 4, 0, Math.PI*2); ctx.fill();
-                if(appState === "EDITOR") { ctx.strokeStyle = "#333"; ctx.lineWidth=1; ctx.strokeRect(sx, obj.y, GRID, GRID); }
+        }
+
+        // --- SHARE MENU LOGIC ---
+        function exportCurrentInput() {
+            var title = document.getElementById("itemTitle").value;
+            var category = document.getElementById("itemCategory").value;
+            var code = document.getElementById("itemCode").value;
+
+            if (title.trim() === "" || code.trim() === "") {
+                alert("Please fill in Title and Content before exporting.");
+                return;
             }
-            else if (obj.type === 'end') {
-                ctx.fillStyle = "#00ccff"; ctx.fillRect(sx + 10, obj.y, 5, GRID);
-                ctx.beginPath(); ctx.moveTo(sx + 15, obj.y); ctx.lineTo(sx + 40, obj.y + 10); ctx.lineTo(sx + 15, obj.y + 20); ctx.fill(); 
+            prepareShareModal(title, category, code);
+        }
+
+        function exportItem(event, category, id) {
+            event.stopPropagation();
+            var items = libraryData[category];
+            var item = items.find(i => i.id === id);
+
+            if (item) {
+                prepareShareModal(item.title, category, item.code);
             }
-        });
-
-        if(appState === "EDITOR") {
-             ctx.globalAlpha = 0.5; drawPlayerIcon(150 - editorScroll, FLOOR_Y - GRID, 0); ctx.globalAlpha = 1.0;
-        } else {
-            drawPlayerIcon(player.x, player.y, player.angle);
         }
-    }
 
-    function drawPlayerIcon(x, y, angle) {
-        ctx.save(); ctx.translate(x + GRID/2, y + GRID/2); ctx.rotate(angle);
-        ctx.fillStyle = "#FFD700"; ctx.fillRect(-GRID/2, -GRID/2, GRID, GRID);
-        ctx.strokeStyle = "black"; ctx.lineWidth = 2; ctx.strokeRect(-GRID/2, -GRID/2, GRID, GRID);
-        ctx.fillStyle = "black"; ctx.fillRect(4, -6, 10, 10); ctx.fillRect(4, 8, 8, 4);
-        ctx.restore();
-    }
+        function prepareShareModal(title, category, code) {
+            var dataObj = { title: title, category: category, code: code };
+            var jsonString = JSON.stringify(dataObj);
+            var encodedString = btoa(encodeURIComponent(jsonString));
 
-    function loop() {
-        if(appState.startsWith("PLAYING") && appState !== "CRASHED") {
-            globalFrame++; update(); draw();
-            gameLoopId = requestAnimationFrame(loop);
+            document.getElementById("shareOutput").value = encodedString;
+            document.getElementById("ShareModal").style.display = "flex";
         }
-    }
-    
-    // Core Functions
-    function die() { 
-        player.dead = true; 
-        appState = "CRASHED"; 
-        
-        // Show the crash overlay
-        document.getElementById('msg-overlay').classList.remove('hidden'); 
-        
-        // VISIBILITY LOGIC:
-        // If we came from the Editor, we might want to edit.
-        // If we came from the Menu, we should NEVER see the edit button.
-        const editBtn = document.getElementById('btn-edit-crash');
-        
-        if (startedFromEditor) {
-            editBtn.classList.remove('hidden'); // Show Edit if Dev
-        } else {
-            editBtn.classList.add('hidden');    // Hide Edit if Player
+
+        function copyShareCode() {
+            var copyText = document.getElementById("shareOutput");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value).then(function () {
+                alert("✅ Code Copied! Send it to a friend.");
+                closeShareModal();
+            }, function () {
+                alert("Failed to copy. Please copy manually.");
+            });
         }
-    }
 
-    function winLevel() { appState="WON"; document.getElementById('success-overlay').classList.remove('hidden'); }
-    
-    function startLevel(idx) {
-        if(idx >= playlist.length) { document.getElementById('victory-overlay').classList.remove('hidden'); return; }
-        
-        // Determine if this is a Dev or User session based on current app state
-        startedFromEditor = (appState === "EDITOR");
-
-        toggleEditorUI(false); 
-        appState = startedFromEditor ? "PLAYING_DEV" : "PLAYING_USER";
-        
-        resetOverlays(); 
-        gameObjects = JSON.parse(JSON.stringify(playlist[idx].map));
-        player.x = 150; player.y = FLOOR_Y - GRID; player.dy = 0; player.angle = 0; player.onGround = true; distance = 0;
-        loop();
-    }
-
-    function stopGame() { 
-        if(gameLoopId) cancelAnimationFrame(gameLoopId); 
-        appState="EDITOR"; 
-        resetOverlays(); 
-        toggleEditorUI(true); 
-        draw(); 
-    }
-
-    function retryLevel() { startLevel(currentLevelIndex); }
-    function nextLevel() { currentLevelIndex++; startLevel(currentLevelIndex); }
-    function clearLevel() { if(confirm("Clear?")) { editorObjects = []; draw(); } }
-    
-    function publishLevel() {
-        if(!editorObjects.some(o => o.type === 'end')) { alert("Missing End Flag!"); return; }
-        let data = JSON.parse(JSON.stringify(editorObjects)); data.sort((a,b)=>a.x-b.x);
-        if(editingIndex!==null) playlist[editingIndex].map = data; else playlist.push({map:data, name:"Level "+(playlist.length+1)});
-        saveGame(); openDevDashboard();
-    }
-    
-    function openDevDashboard() { hideAllScreens(); document.getElementById('dev-level-select').classList.remove('hidden'); renderLevelList(true); }
-    function openPlayerLevelSelect() { hideAllScreens(); document.getElementById('player-level-select').classList.remove('hidden'); renderLevelList(false); }
-    
-    function createNewLevel() { editingIndex=null; editorObjects=[]; enterEditor(); }
-    
-    function enterEditor() { 
-        hideAllScreens(); 
-        appState="EDITOR"; 
-        document.getElementById('editor-interface').classList.remove('hidden'); 
-        toggleEditorUI(true); 
-        draw(); 
-    }
-    
-    function quitEditor() { if(confirm("Quit?")) openDevDashboard(); }
-    
-    function startPlaylist() { 
-        if(playlist.length) { 
-            currentLevelIndex=0; 
-            hideAllScreens(); 
-            document.getElementById('editor-interface').classList.remove('hidden'); 
-            startLevel(0); 
+        function closeShareModal() {
+            document.getElementById("ShareModal").style.display = "none";
         }
-    }
-    
-    function renderLevelList(isDev) {
-        const c = document.getElementById(isDev ? 'level-list-container' : 'player-list-container'); c.innerHTML="";
-        if(!playlist.length) c.innerHTML="<p style='color:#666;text-align:center'>Empty</p>";
-        playlist.forEach((l,i) => {
-            const d = document.createElement('div');
-            d.className = isDev ? 'level-item' : 'level-item-play';
-            d.innerHTML = isDev ? `<span>${l.name}</span><div><button onclick="editLevel(${i})">Edit</button><button onclick="deleteLevel(${i})">Del</button></div>` : `${i+1}. ${l.name}`;
-            if(!isDev) d.onclick=()=>playSpec(i);
-            c.appendChild(d);
-        });
-    }
-    
-    function editLevel(i) { editingIndex=i; editorObjects=JSON.parse(JSON.stringify(playlist[i].map)); enterEditor(); }
-    function deleteLevel(i) { if(confirm("Del?")) { playlist.splice(i,1); saveGame(); renderLevelList(true); }}
-    
-    function playSpec(i) { 
-        currentLevelIndex=i; 
-        hideAllScreens(); 
-        document.getElementById('editor-interface').classList.remove('hidden'); 
-        startLevel(i); 
-    }
-    
-    const SECRET=[115,124,119,107,114,113,67,125,104,121];
-    function showLogin(){document.getElementById('login-modal').classList.remove('hidden');}
-    function hideLogin(){document.getElementById('login-modal').classList.add('hidden');}
-    function checkPass(){ let v=document.getElementById('pass-input').value; let ok=v.length===SECRET.length; 
-        if(ok) for(let i=0;i<v.length;i++) if(v.charCodeAt(i)+3!==SECRET[i]) ok=false; 
-        if(ok){hideLogin();openDevDashboard();} else alert("Wrong"); }
-    
-    function exportLevel(){ if(!editorObjects.length) return; dataModalMode="EXPORT"; document.getElementById('data-area').value=btoa(JSON.stringify(editorObjects)); document.getElementById('data-modal').classList.remove('hidden'); }
-    function showImport(m){ dataModalMode=m; document.getElementById('data-area').value=""; document.getElementById('data-modal').classList.remove('hidden'); }
-    function closeDataModal(){ document.getElementById('data-modal').classList.add('hidden'); }
-    function handleDataAction(){
-        if(dataModalMode==="EXPORT"){ document.getElementById('data-area').select(); document.execCommand('copy'); alert("Copied"); }
-        else {
+
+        // --- IMPORT LOGIC ---
+        function importFromCode() {
+            var pastedCode = prompt("Paste your Game/App/News Code here:");
+
+            if (pastedCode == null || pastedCode.trim() == "") return;
+
             try {
-                let d = JSON.parse(atob(document.getElementById('data-area').value));
-                if(dataModalMode==="play") { playlist.push({map:d, name:"Imp "+(playlist.length+1)}); saveGame(); alert("Saved!"); closeDataModal(); }
-                else { editorObjects=d; closeDataModal(); draw(); }
-            } catch(e){ alert("Bad Code"); }
+                var jsonString = decodeURIComponent(atob(pastedCode));
+                var dataObj = JSON.parse(jsonString);
+
+                if (!dataObj.title || !dataObj.category || !dataObj.code) {
+                    throw new Error("Invalid Code Format");
+                }
+
+                // Auto-fix if category missing
+                if (!libraryData[dataObj.category]) {
+                    libraryData[dataObj.category] = [];
+                }
+
+                var newItem = {
+                    id: Date.now(),
+                    title: dataObj.title,
+                    code: dataObj.code
+                };
+
+                libraryData[dataObj.category].push(newItem);
+                saveToBrowser();
+
+                // Refresh ALL
+                renderLibrary("Games");
+                renderLibrary("Apps");
+                renderLibrary("Announcements");
+
+                alert("Successfully imported: " + dataObj.title);
+
+            } catch (err) {
+                alert("Error: That code didn't work. Make sure you copied the whole thing!");
+                console.error(err);
+            }
         }
-    }
 
-    slider.oninput=function(){if(appState==="EDITOR"){editorScroll=parseInt(this.value);draw();}}
-    canvas.addEventListener('mousedown', handleEditorClick);
-    canvas.addEventListener('wheel', e=>{ if(appState==="EDITOR"){e.preventDefault(); editorScroll=Math.max(0, editorScroll+(e.deltaY>0?50:-50)); slider.value=editorScroll; draw();}}, {passive:false});
-    window.addEventListener('keydown', e=>{
-        if(e.code==='Space'||e.code==='ArrowUp'){ e.preventDefault(); if(appState.startsWith("PLAYING")) attemptJump(); }
-        if(appState==="EDITOR" && (e.code==='KeyD'||e.code==='ArrowRight')) { editorScroll+=30; slider.value=editorScroll; draw(); }
-        if(appState==="EDITOR" && (e.code==='KeyA'||e.code==='ArrowLeft')) { editorScroll=Math.max(0, editorScroll-30); slider.value=editorScroll; draw(); }
-    });
+        // Initialize
+        document.getElementById("defaultOpen").click();
+        renderLibrary("Games");
+        renderLibrary("Apps");
+        renderLibrary("Announcements");
+    </script>
 
-</script>
 </body>
-</html>
 
+</html>
