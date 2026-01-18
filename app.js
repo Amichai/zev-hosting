@@ -716,13 +716,40 @@ async function saveGameScore(scoreValue) {
 
     const scoresData = await fetchScores();
 
-    scoresData.scores.push({
-        id: Date.now(),
-        username: currentUser,
-        gameTitle: activeGameTitle,
-        score: scoreValue,
-        timestamp: new Date().toISOString()
-    });
+    // Find existing score for this user and game
+    const existingScoreIndex = scoresData.scores.findIndex(
+        s => s.username === currentUser && s.gameTitle === activeGameTitle
+    );
+
+    if (existingScoreIndex !== -1) {
+        // User already has a score for this game
+        const existingScore = scoresData.scores[existingScoreIndex];
+
+        if (scoreValue > existingScore.score) {
+            // New score is better - update it
+            scoresData.scores[existingScoreIndex] = {
+                id: Date.now(),
+                username: currentUser,
+                gameTitle: activeGameTitle,
+                score: scoreValue,
+                timestamp: new Date().toISOString()
+            };
+        } else {
+            // New score is not better - don't save it
+            showLoading(false);
+            showStatus(`Current best: ${existingScore.score}. Score not saved.`);
+            return;
+        }
+    } else {
+        // First score for this user and game
+        scoresData.scores.push({
+            id: Date.now(),
+            username: currentUser,
+            gameTitle: activeGameTitle,
+            score: scoreValue,
+            timestamp: new Date().toISOString()
+        });
+    }
 
     const saved = await saveScores(scoresData);
 
