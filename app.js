@@ -10,6 +10,10 @@ const API_KEY = "$2a$10$rLNJhoJMs00bpIHZI5LJlueE.7g3800UXxlRehqRoLgfgNApBiCHm";
 const USERS_BIN_ID = "696d461843b1c97be9395b64";
 const USERS_API_URL = `https://api.jsonbin.io/v3/b/${USERS_BIN_ID}`;
 
+// Scores bin (create a new bin on JSONBin.io and paste the ID here)
+const SCORES_BIN_ID = "696d4dffae596e708fe53af0";
+const SCORES_API_URL = `https://api.jsonbin.io/v3/b/${SCORES_BIN_ID}`;
+
 var libraryData = { "Games": [], "Apps": [], "Announcements": [] };
 var isAdmin = false;
 var currentUser = null;
@@ -638,6 +642,177 @@ function handleLogout() {
     if (isAuthMode) {
         toggleAuthMode();
     }
+}
+
+// --- SCORE TRACKING FUNCTIONS ---
+
+async function fetchScores() {
+    if (SCORES_BIN_ID === "PASTE_YOUR_SCORES_BIN_ID_HERE") {
+        console.error("Scores bin not configured");
+        return { scores: [] };
+    }
+
+    try {
+        const response = await fetch(SCORES_API_URL, {
+            method: "GET",
+            headers: {
+                "X-Master-Key": API_KEY,
+                "X-Bin-Meta": "false"
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                return { scores: [] };
+            }
+            throw new Error("Failed to fetch scores: " + response.status);
+        }
+
+        const data = await response.json();
+        return data || { scores: [] };
+    } catch (error) {
+        console.error("Fetch scores error:", error);
+        return { scores: [] };
+    }
+}
+
+async function saveScores(scoresData) {
+    if (SCORES_BIN_ID === "PASTE_YOUR_SCORES_BIN_ID_HERE") {
+        console.error("Scores bin not configured");
+        return false;
+    }
+
+    try {
+        const response = await fetch(SCORES_API_URL, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Master-Key": API_KEY
+            },
+            body: JSON.stringify(scoresData)
+        });
+
+        if (!response.ok) throw new Error("Save scores failed: " + response.status);
+        return true;
+    } catch (error) {
+        console.error("Save scores error:", error);
+        return false;
+    }
+}
+
+// This function is called by games running in iframes
+async function saveGameScore(scoreValue) {
+    if (!currentUser) {
+        alert("Please log in to save scores.");
+        return;
+    }
+
+    // Get current game title from the active player
+    const activeGameTitle = document.getElementById("ActiveGameTitle")?.innerText
+        || document.getElementById("ActiveAppTitle")?.innerText
+        || "Unknown Game";
+
+    showLoading(true);
+
+    const scoresData = await fetchScores();
+
+    scoresData.scores.push({
+        id: Date.now(),
+        username: currentUser,
+        gameTitle: activeGameTitle,
+        score: scoreValue,
+        timestamp: new Date().toISOString()
+    });
+
+    const saved = await saveScores(scoresData);
+
+    showLoading(false);
+
+    if (saved) {
+        showStatus(`✅ Score saved: ${scoreValue}`);
+    } else {
+        showStatus("❌ Failed to save score");
+    }
+}
+
+// Get leaderboard for a specific game
+async function getLeaderboard(gameTitle, limit = 10) {
+    const scoresData = await fetchScores();
+
+    return scoresData.scores
+        .filter(s => s.gameTitle === gameTitle)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit);
+}
+
+// Get user's personal best for a game
+async function getPersonalBest(gameTitle) {
+    if (!currentUser) return 0;
+
+    const scoresData = await fetchScores();
+
+    const userScores = scoresData.scores
+        .filter(s => s.gameTitle === gameTitle && s.username === currentUser)
+        .sort((a, b) => b.score - a.score);
+
+    return userScores.length > 0 ? userScores[0].score : 0;
+}
+
+// Render the high scores page
+async function renderHighScores() {
+    const container = document.getElementById("highScoresContainer");
+    if (!container) return;
+
+    showLoading(true);
+    container.innerHTML = "<p>Loading scores...</p>";
+
+    const scoresData = await fetchScores();
+
+    showLoading(false);
+
+    if (!scoresData.scores || scoresData.scores.length === 0) {
+        container.innerHTML = "<p style='color:#666; font-style:italic;'>No scores recorded yet. Play some games!</p>";
+        return;
+    }
+
+    // Group scores by game
+    const gameGroups = {};
+    scoresData.scores.forEach(score => {
+        if (!gameGroups[score.gameTitle]) {
+            gameGroups[score.gameTitle] = [];
+        }
+        gameGroups[score.gameTitle].push(score);
+    });
+
+    // Sort each game's scores and render
+    let html = "";
+    Object.keys(gameGroups).sort().forEach(gameTitle => {
+        const gameScores = gameGroups[gameTitle]
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10); // Top 10 per game
+
+        html += `<div class="game-scores-section">`;
+        html += `<h3>🎮 ${gameTitle}</h3>`;
+        html += `<table class="scores-table">`;
+        html += `<tr><th>Rank</th><th>Player</th><th>Score</th><th>Date</th></tr>`;
+
+        gameScores.forEach((score, index) => {
+            const date = new Date(score.timestamp).toLocaleDateString();
+            const rankEmoji = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `${index + 1}.`;
+            const isCurrentUser = score.username === currentUser ? " class='current-user-score'" : "";
+
+            html += `<tr${isCurrentUser}>`;
+            html += `<td>${rankEmoji}</td>`;
+            html += `<td>${score.username}</td>`;
+            html += `<td><strong>${score.score}</strong></td>`;
+            html += `<td>${date}</td>`;
+            html += `</tr>`;
+        });
+
+        html += `</table></div>`;
+    });
+
+    container.innerHTML = html;
 }
 
 // Initialize

@@ -502,3 +502,61 @@ textarea {
 .toggle-auth-btn:hover {
     background-color: #555;
 }
+
+/* --- HIGH SCORES STYLING --- */
+.game-scores-section {
+    margin-bottom: 40px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.game-scores-section h3 {
+    color: #d32f2f;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 22px;
+    border-bottom: 2px solid #d32f2f;
+    padding-bottom: 10px;
+}
+
+.scores-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scores-table th {
+    background-color: #333;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: bold;
+}
+
+.scores-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+}
+
+.scores-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+.scores-table tr:last-child td {
+    border-bottom: none;
+}
+
+.scores-table tr.current-user-score {
+    background-color: #fff3cd;
+    font-weight: bold;
+}
+
+.scores-table tr.current-user-score:hover {
+    background-color: #ffe69c;
+}
