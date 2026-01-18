@@ -31,6 +31,34 @@ h2 {
     background-color: #d32f2f;
 }
 
+/* Logout Button */
+.logout-btn {
+    position: absolute;
+    top: 20px;
+    right: 180px;
+    padding: 10px 20px;
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.logout-btn:hover {
+    background-color: #b71c1c;
+}
+
+/* Username Label */
+.username-label {
+    position: absolute;
+    top: 25px;
+    right: 340px;
+    color: #333;
+    font-weight: bold;
+    font-size: 16px;
+}
+
 /* Tab Container */
 .tab {
     overflow: hidden;
@@ -398,4 +426,79 @@ textarea {
     font-size: 12px;
     text-align: center;
     display: none;
+}
+
+/* --- AUTHENTICATION MODAL --- */
+.auth-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-box {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.auth-box h2 {
+    color: #d32f2f;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.auth-form {
+    text-align: left;
+    margin-top: 20px;
+}
+
+.auth-form label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.auth-form input[type="text"],
+.auth-form input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.auth-form input[type="text"]:focus,
+.auth-form input[type="password"]:focus {
+    outline: none;
+    border-color: #d32f2f;
+}
+
+.toggle-auth-btn {
+    background-color: #777;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.toggle-auth-btn:hover {
+    background-color: #555;
 }

@@ -15,7 +15,10 @@
     <h2>yakawow <span style="font-size: 14px; color: #777;">(Cloud Edition)</span></h2>
     <span id="loadingIndicator">🔄 Syncing...</span>
 
-    <button class="top-right-btn" onclick="attemptLogin()">🔒 Login</button>
+    <button class="top-right-btn" onclick="attemptLogin()">🔒 Admin Login</button>
+    <button class="logout-btn" onclick="handleLogout()">🚪 Log Out</button>
+
+    <span id="usernameLabel" class="username-label"></span>
 
     <div class="tab">
         <button class="tablinks" onclick="openTab(event, 'Home')" id="defaultOpen">Home</button>
@@ -104,6 +107,45 @@
             <br>
             <button class="copy-btn" onclick="copyShareCode()">📋 COPY</button>
             <button class="close-share-btn" onclick="closeShareModal()">Close</button>
+        </div>
+    </div>
+
+    <div id="AuthModal" class="auth-modal">
+        <div class="auth-box">
+            <h2>Welcome to yakawow</h2>
+            <p id="authMessage">Please log in or create an account to continue.</p>
+
+            <div class="auth-form">
+                <label><strong>Username:</strong></label>
+                <input type="text" id="authUsername" placeholder="Enter username" autocomplete="username">
+
+                <div id="loginPasswordSection">
+                    <label><strong>Password:</strong></label>
+                    <input type="password" id="authPassword" placeholder="Enter password"
+                        autocomplete="current-password">
+                    <button class="action-btn" onclick="handleLogin()">Login</button>
+                </div>
+
+                <div id="signupSection" style="display: none;">
+                    <p style="color: #666; font-size: 14px; margin: 10px 0;">A random password will be generated for
+                        you.</p>
+                    <div id="generatedPasswordDisplay"
+                        style="display: none; margin: 15px 0; padding: 15px; background: #f0f0f0; border-radius: 5px;">
+                        <strong>Your Password:</strong>
+                        <div style="font-family: monospace; font-size: 16px; margin: 10px 0; padding: 10px; background: white; border: 1px solid #ccc; border-radius: 3px; word-break: break-all;"
+                            id="generatedPasswordText"></div>
+                        <p style="color: #d9534f; font-size: 12px; margin-top: 10px;">⚠️ IMPORTANT: Save this password!
+                            You'll need it to log in.</p>
+                        <button class="copy-btn" onclick="copyGeneratedPassword()">📋 Copy Password</button>
+                    </div>
+                    <button class="action-btn" onclick="handleSignup()" id="createAccountBtn">Create Account</button>
+                </div>
+
+                <hr style="margin: 20px 0;">
+
+                <button class="toggle-auth-btn" onclick="toggleAuthMode()" id="toggleAuthBtn">Create New
+                    Account</button>
+            </div>
         </div>
     </div>
 

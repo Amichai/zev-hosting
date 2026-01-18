@@ -6,8 +6,14 @@ const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 // It starts with "$2b$10$..." or "$2a$10$..."
 const API_KEY = "$2a$10$rLNJhoJMs00bpIHZI5LJlueE.7g3800UXxlRehqRoLgfgNApBiCHm";
 
+// User authentication bin (you'll need to create a separate bin for users)
+const USERS_BIN_ID = "696d461843b1c97be9395b64";
+const USERS_API_URL = `https://api.jsonbin.io/v3/b/${USERS_BIN_ID}`;
+
 var libraryData = { "Games": [], "Apps": [], "Announcements": [] };
 var isAdmin = false;
+var currentUser = null;
+var isAuthMode = false;
 
 // --- CLOUD FUNCTIONS ---
 
@@ -384,9 +390,263 @@ async function importFromCode() {
     }
 }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
+// --- AUTHENTICATION FUNCTIONS ---
+
+function generateRandomPassword(numWords = 2, separator = '-') {
+    // Common word list - you can expand this significantly
+    const wordList = [
+        'apple', 'banana', 'cherry', 'dragon', 'eagle', 'forest', 'garden', 'happy',
+        'island', 'jungle', 'kitten', 'lemon', 'moon', 'ninja', 'ocean', 'panda',
+        'queen', 'river', 'sunset', 'tiger', 'unicorn', 'violet', 'wizard', 'yellow',
+        'zebra', 'anchor', 'bridge', 'castle', 'diamond', 'ember', 'flame', 'galaxy',
+        'harbor', 'iron', 'jazz', 'knight', 'lotus', 'magic', 'nebula', 'orbit',
+        'phoenix', 'quartz', 'rocket', 'storm', 'thunder', 'ultra', 'vortex', 'wave',
+        'xenon', 'yoga', 'alpine', 'blaze', 'cosmos', 'delta', 'echo',
+        'frost', 'glow', 'hero', 'iris', 'jade', 'kilo', 'laser', 'metro',
+        'nova', 'opal', 'prism', 'quest', 'radar', 'solar', 'tempo', 'unity',
+        'vapor', 'winter', 'xray', 'youth', 'zenith', 'amber', 'bolt', 'cloud'
+    ];
+
+    const array = new Uint32Array(numWords);
+    crypto.getRandomValues(array);
+
+    const words = [];
+    for (let i = 0; i < numWords; i++) {
+        const randomIndex = array[i] % wordList.length;
+        words.push(wordList[randomIndex]);
+    }
+
+    // Optional: Add a random number at the end for extra security
+    const numberArray = new Uint32Array(1);
+    crypto.getRandomValues(numberArray);
+    const randomNumber = numberArray[0] % 100;
+
+    return words.join(separator) + separator + randomNumber;
+}
+
+// Examples:
+// generateRandomPassword(4, '-')  → "dragon-sunset-nebula-wizard-73"
+// generateRandomPassword(3, '.')  → "tiger.cosmos.anchor.42"
+// generateRandomPassword(5)       → "ocean-castle-phoenix-lunar-frost-91"
+
+async function fetchUsers() {
+    if (USERS_BIN_ID === "PASTE_YOUR_USERS_BIN_ID_HERE") {
+        console.error("Users bin not configured");
+        return null;
+    }
+
+    try {
+        const response = await fetch(USERS_API_URL, {
+            method: "GET",
+            headers: {
+                "X-Master-Key": API_KEY,
+                "X-Bin-Meta": "false"
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                return { users: [] };
+            }
+            throw new Error("Failed to fetch users: " + response.status);
+        }
+
+        const data = await response.json();
+        return data || { users: [] };
+    } catch (error) {
+        console.error("Fetch users error:", error);
+        return null;
+    }
+}
+
+async function saveUsers(usersData) {
+    if (USERS_BIN_ID === "PASTE_YOUR_USERS_BIN_ID_HERE") {
+        alert("⚠️ Users bin not configured. Please create a bin for user data.");
+        return false;
+    }
+
+    try {
+        const response = await fetch(USERS_API_URL, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Master-Key": API_KEY
+            },
+            body: JSON.stringify(usersData)
+        });
+
+        if (!response.ok) throw new Error("Save users failed: " + response.status);
+        return true;
+    } catch (error) {
+        console.error("Save users error:", error);
+        return false;
+    }
+}
+
+function toggleAuthMode() {
+    isAuthMode = !isAuthMode;
+    const loginSection = document.getElementById("loginPasswordSection");
+    const signupSection = document.getElementById("signupSection");
+    const toggleBtn = document.getElementById("toggleAuthBtn");
+    const authMessage = document.getElementById("authMessage");
+
+    if (isAuthMode) {
+        loginSection.style.display = "none";
+        signupSection.style.display = "block";
+        toggleBtn.innerText = "Back to Login";
+        authMessage.innerText = "Create a new account";
+    } else {
+        loginSection.style.display = "block";
+        signupSection.style.display = "none";
+        toggleBtn.innerText = "Create New Account";
+        authMessage.innerText = "Please log in or create an account to continue.";
+        document.getElementById("generatedPasswordDisplay").style.display = "none";
+    }
+}
+
+async function handleSignup() {
+    const username = document.getElementById("authUsername").value.trim();
+
+    if (!username) {
+        alert("Please enter a username.");
+        return;
+    }
+
+    const usersData = await fetchUsers();
+    if (!usersData) {
+        alert("Error connecting to authentication server.");
+        return;
+    }
+
+    const existingUser = usersData.users.find(u => u.username === username);
+    if (existingUser) {
+        alert("Username already exists. Please choose a different username.");
+        return;
+    }
+
+    const password = generateRandomPassword();
+
+    document.getElementById("generatedPasswordText").innerText = password;
+    document.getElementById("generatedPasswordDisplay").style.display = "block";
+    document.getElementById("createAccountBtn").style.display = "none";
+
+    usersData.users.push({
+        username: username,
+        password: password,
+        createdAt: new Date().toISOString()
+    });
+
+    const saved = await saveUsers(usersData);
+    if (saved) {
+        alert("Account created successfully! Make sure to save your password.");
+    } else {
+        alert("Error creating account. Please try again.");
+    }
+}
+
+function copyGeneratedPassword() {
+    const passwordText = document.getElementById("generatedPasswordText").innerText;
+    navigator.clipboard.writeText(passwordText).then(function () {
+        alert("✅ Password copied to clipboard!");
+    }, function () {
+        alert("Failed to copy. Please copy manually.");
+    });
+}
+
+async function handleLogin() {
+    const username = document.getElementById("authUsername").value.trim();
+    const password = document.getElementById("authPassword").value;
+
+    if (!username || !password) {
+        alert("Please enter both username and password.");
+        return;
+    }
+
+    const usersData = await fetchUsers();
+    if (!usersData) {
+        alert("Error connecting to authentication server.");
+        return;
+    }
+
+    const user = usersData.users.find(u => u.username === username && u.password === password);
+
+    if (user) {
+        currentUser = username;
+        sessionStorage.setItem("authenticatedUser", username);
+        updateUsernameLabel();
+        closeAuthModal();
+        fetchLibrary();
+    } else {
+        alert("Invalid username or password.");
+    }
+}
+
+function closeAuthModal() {
+    document.getElementById("AuthModal").style.display = "none";
+    document.body.style.overflow = "auto";
+}
+
+function updateUsernameLabel() {
+    const usernameLabel = document.getElementById("usernameLabel");
+    if (currentUser) {
+        usernameLabel.innerText = `Hi ${currentUser}!`;
+    } else {
+        usernameLabel.innerText = "";
+    }
+}
+
+function checkAuthentication() {
+    const storedUser = sessionStorage.getItem("authenticatedUser");
+    if (storedUser) {
+        currentUser = storedUser;
+        updateUsernameLabel();
+        return true;
+    }
+    return false;
+}
+
+function showAuthModal() {
+    document.getElementById("AuthModal").style.display = "flex";
+    document.body.style.overflow = "hidden";
+}
+
+function handleLogout() {
+    // Clear session storage
+    sessionStorage.removeItem("authenticatedUser");
+
+    // Reset current user
+    currentUser = null;
+    updateUsernameLabel();
+
+    // Reset admin state
+    isAdmin = false;
+    document.getElementById("adminTabBtn").style.display = "none";
+
+    // Clear library data
+    libraryData = { "Games": [], "Apps": [], "Announcements": [] };
+    renderAll();
+
+    // Switch to Home tab
     document.getElementById("defaultOpen").click();
-    // Start Fetch
-    fetchLibrary();
+
+    // Show authentication modal (cannot be closed until login)
+    showAuthModal();
+
+    // Reset auth form
+    document.getElementById("authUsername").value = "";
+    document.getElementById("authPassword").value = "";
+    if (isAuthMode) {
+        toggleAuthMode();
+    }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById("defaultOpen").click();
+
+    if (!checkAuthentication()) {
+        showAuthModal();
+    } else {
+        fetchLibrary();
+    }
 });
