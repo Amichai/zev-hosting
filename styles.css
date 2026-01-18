@@ -1,0 +1,401 @@
+/* --- CSS: Main Styling --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f9;
+}
+
+h2 {
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: inline-block;
+}
+
+/* Top Right Login Button */
+.top-right-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.top-right-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Tab Container */
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #333;
+    border-radius: 5px 5px 0 0;
+    margin-top: 20px;
+}
+
+/* Tab Buttons */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+    color: white;
+    font-weight: bold;
+}
+
+.tab button:hover {
+    background-color: #555;
+}
+
+.tab button.active {
+    background-color: #d32f2f;
+}
+
+#adminTabBtn {
+    display: none;
+    background-color: #444;
+    color: #ff9800;
+}
+
+/* Tab Content */
+.tabcontent {
+    display: none;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-top: none;
+    background-color: white;
+    min-height: 600px;
+    border-radius: 0 0 5px 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* --- LIBRARY GRID --- */
+.library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.game-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border-color: #d32f2f;
+}
+
+.game-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.game-title {
+    font-weight: bold;
+    color: #333;
+    word-break: break-word;
+}
+
+/* --- ANNOUNCEMENTS --- */
+.announcement-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 10px;
+    background-color: #fff8e1;
+    border-radius: 8px;
+}
+
+.announcement-card {
+    background-color: #fff;
+    border: 1px solid #ffeeba;
+    border-left: 5px solid #ffc107;
+    padding: 15px;
+    border-radius: 4px;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.announcement-title {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 8px;
+    display: block;
+    color: #d32f2f;
+}
+
+.announcement-text {
+    color: #333;
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* --- CARD BUTTONS --- */
+.delete-card-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 2px 6px;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.delete-card-btn:hover {
+    background-color: darkred;
+}
+
+.export-card-btn {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 2px 6px;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.export-card-btn:hover {
+    background-color: #0b7dda;
+}
+
+/* --- PLAYER OVERLAY --- */
+.player-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 1000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.back-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: rgba(211, 47, 47, 0.8);
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 1001;
+}
+
+.back-btn:hover {
+    background-color: #ff5252;
+}
+
+#ActiveGameTitle,
+#ActiveAppTitle {
+    display: none;
+}
+
+.iframe-wrapper {
+    width: 95vw;
+    height: 95vh;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.game-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+/* --- SHARE MODAL --- */
+.share-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.share-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.share-textarea {
+    width: 100%;
+    height: 100px;
+    margin: 10px 0;
+    font-family: monospace;
+    font-size: 12px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    background-color: #eee;
+    color: #555;
+    resize: none;
+}
+
+.copy-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.copy-btn:hover {
+    background-color: #3e8e41;
+}
+
+.close-share-btn {
+    background-color: #777;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.close-share-btn:hover {
+    background-color: #555;
+}
+
+
+/* --- Admin Styling --- */
+.admin-controls {
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+input[type="text"],
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+textarea {
+    height: 150px;
+    font-family: monospace;
+}
+
+.action-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 4px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.export-btn {
+    background-color: #2196F3;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 4px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.cloud-upload-btn {
+    background-color: #673AB7;
+    /* Purple */
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 4px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.danger-btn {
+    background-color: #d32f2f;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    width: 100%;
+}
+
+/* Loader */
+#loadingIndicator {
+    display: none;
+    color: #666;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+.status-bar {
+    background: #e0f7fa;
+    color: #006064;
+    padding: 5px 10px;
+    font-size: 12px;
+    text-align: center;
+    display: none;
+}
