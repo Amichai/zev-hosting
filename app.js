@@ -4,7 +4,7 @@ const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
 // ⚠️ VITAL: You must paste your "Master Key" from jsonbin.io below.
 // It starts with "$2b$10$..." or "$2a$10$..."
-const API_KEY = "$2a$10$rLNJhoJMs00bpIHZI5LJlueE.7g3800UXxlRehqRoLgfgNApBiCHm";
+const API_KEY = "$2a$10$Wm87Q0b7.J7kNQfyu9jNkOLu/onc..IALNaKxKyDjSHeUReiOL05y";
 
 // User authentication bin (you'll need to create a separate bin for users)
 const USERS_BIN_ID = "696d461843b1c97be9395b64";
@@ -44,7 +44,7 @@ async function fetchLibrary() {
         const response = await fetch(API_URL, {
             method: "GET",
             headers: {
-                "X-Master-Key": API_KEY,
+                "X-Access-Key": API_KEY,
                 "X-Bin-Meta": "false" // This strips the 'record' wrapper
             }
         });

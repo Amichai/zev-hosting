@@ -24,7 +24,6 @@
         <button class="tablinks" onclick="openTab(event, 'Home')" id="defaultOpen">Home</button>
         <button class="tablinks" onclick="openTab(event, 'Apps')">Apps</button>
         <button class="tablinks" onclick="openTab(event, 'Games')">Games</button>
-        <button class="tablinks" onclick="openTab(event, 'HighScores'); renderHighScores()">High Scores</button>
         <button class="tablinks" onclick="openTab(event, 'Admin')" id="adminTabBtn">Admin</button>
     </div>
 
@@ -65,14 +64,6 @@
             <button class="back-btn" onclick="closeItem('Games')">❌ CLOSE</button>
             <h2 id="ActiveGameTitle"></h2>
             <div id="GamesFrameContainer" class="iframe-wrapper"></div>
-        </div>
-    </div>
-
-    <div id="HighScores" class="tabcontent">
-        <h3>High Scores</h3>
-        <p>Top scores across all games:</p>
-        <div id="highScoresContainer">
-            <p>Loading...</p>
         </div>
     </div>
 
