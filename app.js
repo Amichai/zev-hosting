@@ -18,6 +18,7 @@ var libraryData = { "Games": [], "Apps": [], "Announcements": [] };
 var isAdmin = false;
 var currentUser = null;
 var isAuthMode = false;
+var master_key = null;
 
 // --- CLOUD FUNCTIONS ---
 
@@ -84,7 +85,7 @@ async function saveLibraryToCloud() {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                "X-Master-Key": API_KEY
+                "X-Master-Key": master_key
             },
             body: JSON.stringify(libraryData)
         });
@@ -111,17 +112,30 @@ function openTab(evt, tabName) {
 }
 
 // --- LOGIN LOGIC ---
-function attemptLogin() {
+async function attemptLogin() {
     var password = prompt("Enter Admin Password:");
-    if (password === "deathtrap") {
-        alert("Access Granted. Cloud Edit mode enabled.");
-        isAdmin = true;
-        document.getElementById("adminTabBtn").style.display = "block";
-        document.getElementById("adminTabBtn").click();
-        renderAll();
-    } else if (password != null) {
-        alert("Access Denied.");
+    var hashHex = null
+    if (password != null) {
+        try {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+            console.log("Password hash (SHA-256):", hashHex);
+        } catch (error) {
+            console.warn("Password hashing failed:", error);
+        }
     }
+    if (hashHex === '938ea342b71d7d8bc49ebbb96f81ef327ad0f3119900a36d12f327d96f3b232d') {
+        alert("Access Granted. Cloud Edit mode enabled.");
+    }
+
+    isAdmin = true;
+    master_key = password;
+    document.getElementById("adminTabBtn").style.display = "block";
+    document.getElementById("adminTabBtn").click();
+    renderAll();
 }
 
 // --- HELPER: Placeholder Text ---
@@ -443,7 +457,7 @@ async function fetchUsers() {
         const response = await fetch(USERS_API_URL, {
             method: "GET",
             headers: {
-                "X-Master-Key": API_KEY,
+                "X-Access-Key": API_KEY,
                 "X-Bin-Meta": "false"
             }
         });
